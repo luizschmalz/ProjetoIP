@@ -22,7 +22,8 @@ debuff = 0
 rodando = True
 musica_fundo = pg.mixer.music.load("musicafundo.mp3")
 pg.mixer.music.play(-1)
-
+tela_end = pg.image.load("tela end.png")
+tomadas_aparecer = False
 
 class Cracha(pg.sprite.Sprite):
     def __init__(self):
@@ -96,15 +97,8 @@ class Reidograd(pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (int(64 * 1.5), int(64 * 1.5)))
 
         if crachas == 0:
-            if self.rect.x > z:
-                self.rect.x += 4
-            elif self.rect.x < z:
-                self.rect.x -= 4
-
-            if self.rect.y > w:
-                self.rect.y += 4
-            elif self.rect.y < w:
-                self.rect.y -= 4
+            self.rect.x = 700
+            self.rect.y = 50
         else:
             if self.rect.x > z:
                 self.rect.x -= 4
@@ -123,16 +117,39 @@ class Marmita(pg.sprite.Sprite):
         self.sprites.append(pg.image.load('almirante.png'))
         self.image = self.sprites[0]
         self.rect = self.image.get_rect()
-        self.rect.x = randint(50,700)
-        self.rect.y = randint(50,500)
+        self.rect.x = randint(100, 600)
+        self.rect.y = randint(100, 400)
         self.mask = pg.mask.from_surface(self.image)
 
+class Tomadas(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        self.sprites = []
+        self.sprites.append(pg.image.load("tomada1.png"))
+        self.sprites.append(pg.image.load("tomada2.png"))
+        self.sprites.append(pg.image.load("tomada3.png"))
+        self.sprites.append(pg.image.load("tomada4.png"))
+        self.atual = 0
+        self.image = self.sprites[self.atual]
+        self.mask = pg.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.y = randint(50, 550)
+        self.image = pg.transform.scale(self.image, (int(64 * 2), int(64 * 2)))
+
+    def update(self):
+        self.atual += 1
+        if self.atual >= 4:
+            self.atual = 0
+        self.image = self.sprites[self.atual]
+        self.image = pg.transform.scale(self.image, (int(64 * 2), int(64 * 2)))
+        self.rect.x += randint(8, 15)
 
 
 cracha = Cracha()
 rei = Reidograd()
 gota = Gota()
 marmita = Marmita()
+tomada = Tomadas()
 sprites = pg.sprite.Group()
 sprites.add(rei)
 sprites.add(cracha)
@@ -142,10 +159,12 @@ coletaveis = pg.sprite.Group()
 coletaveis.add(cracha)
 inimigos = pg.sprite.Group()
 inimigos.add(rei)
-vencedor = pg.sprite.Group()
-vencedor.add(gota)
 comida = pg.sprite.Group()
 comida.add(marmita)
+tomadas = pg.sprite.Group()
+tomadas.add(tomada)
+vencedor = pg.sprite.Group()
+vencedor.add(gota)
 
 
 
@@ -191,13 +210,13 @@ while True:
                     w = w + 5
             elif debuff == 3:
                 if pg.key.get_pressed()[K_a]:
-                    z = z - 2
+                    z = z - 3
                 if pg.key.get_pressed()[K_d]:
-                    z = z + 2
+                    z = z + 3
                 if pg.key.get_pressed()[K_w]:
-                    w = w - 2
+                    w = w - 3
                 if pg.key.get_pressed()[K_s]:
-                    w = w + 2
+                    w = w + 3
         else:
             pass
 
@@ -208,6 +227,7 @@ while True:
             if crachas == 0:
                 colisao_cracha = pg.sprite.spritecollide(gota, coletaveis, True, pg.sprite.collide_mask)
                 pronto = True
+                tomadas_aparecer = True
             else:
                 coletaveis.draw(tela)
                 coletaveis.update()
@@ -223,27 +243,33 @@ while True:
         else:
             pass
 
-
         colisao_inimigo = pg.sprite.spritecollide(gota, inimigos, False, pg.sprite.collide_mask)
         if colisao_inimigo and not pronto:
-            mensagem1 = "Você Perdeu!"
             rodando = False
-            texto1 = fonte.render(mensagem1, True, (0, 0, 0))
-            tela.blit(fundo, (0, 0))
-            sprites.draw(tela)
-            tela.blit(texto1, (280,200))
+            tela.blit(tela_end, (0, 0))
         if colisao_inimigo and pronto:
             mensagem2 = "Parabéns, agora você se tornou o novo Rei do Grad"
             rodando = False
             texto2 = fonte.render(mensagem2, True, (0, 0, 0))
             tela.blit(fundo, (0, 0))
             tela.blit(texto2, (50, 200))
-            vencedor.draw(tela)
-            vencedor.update()
 
         elif not colisao_inimigo:
             vencedor.update()
             inimigos.update()
+
+        if tomadas_aparecer:
+            colisao_tomadas = pg.sprite.spritecollide(gota, tomadas, False, pg.sprite.collide_mask)
+            if colisao_tomadas:
+                rodando = False
+                tela.blit(tela_end, (0, 0))
+            else:
+                tomadas.draw(tela)
+                tomadas.update()
+        else:
+            pass
+
+
     else:
         relogio.tick(30)
         tela.blit(fundo_start, (0,0))
