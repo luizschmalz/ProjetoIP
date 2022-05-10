@@ -1,10 +1,13 @@
 
+#-----------------------------------importando bibliotecas----------------------------
 
 import pygame as pg
 from pygame.locals import *
 from sys import exit
 from random import randint
 from random import randrange
+
+#-----------------------------------definindo valores iniciais-----------------------
 
 pg.init()
 largura = 800
@@ -24,9 +27,13 @@ rodando = True
 musica_fundo = pg.mixer.music.load("musicafundo.mp3")
 pg.mixer.music.play(-1)
 som_berrante = pg.mixer.Sound("berrante.mp3")
+som_end = pg.mixer.Sound("narutosadsong.mp3")
+som_win = pg.mixer.Sound("batidao.mp3")
 tela_end = pg.image.load("tela end.png")
 tela_win = pg.image.load("tela_win.png")
 tomadas_aparecer = False
+
+#---------------------------definição dos objetos-------------------
 
 class Cracha(pg.sprite.Sprite):
     def __init__(self):
@@ -147,6 +154,7 @@ class Tomadas(pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (int(64 * 2), int(64 * 2)))
         self.rect.x += randint(8, 15)
 
+#-----------------------separando objetos de acordo com a função no jogo-----------
 
 cracha = Cracha()
 rei = Reidograd()
@@ -170,19 +178,21 @@ for i in range(4):
     tomada = Tomadas()
     tomadas.add(tomada)
 
+#-------------------------loop contendo o jogo em si------------------
+
 while True:
-    if start:
+    if start:            #tela inicial
         tela.blit(fundo, (0, 0))
         relogio.tick(30)
         mensagem4 = f"Crachas Restantes: {crachas}"
         texto4 = fonte.render(mensagem4, False, (255, 255, 255))
         tela.blit(texto4, (480, 50))
         sprites.draw(tela)
-        for event in pg.event.get():
+        for event in pg.event.get():         #sair do jogo
             if event.type == QUIT:
                 pg.quit()
                 exit()
-        if rodando:
+        if rodando:           #movimentação do personagem
             if debuff == 0:
                 if pg.key.get_pressed()[K_a]:
                     z = z - 10
@@ -222,6 +232,8 @@ while True:
         else:
             pass
 
+        #----------------------colisoes-------------------
+
         colisao_cracha = pg.sprite.spritecollide(gota, coletaveis, False, pg.sprite.collide_mask)
         if colisao_cracha:
             crachas -= 1
@@ -251,9 +263,13 @@ while True:
         if colisao_inimigo and not pronto:
             rodando = False
             tela.blit(tela_end, (0, 0))
+            pg.mixer.music.stop()
+            som_end.play()
         if colisao_inimigo and pronto:
             rodando = False
             tela.blit(tela_win, (0, 0))
+            som_win.play()
+            pg.mixer.music.stop()
 
         elif not colisao_inimigo:
             vencedor.update()
@@ -264,6 +280,9 @@ while True:
             if colisao_tomadas:
                 rodando = False
                 tela.blit(tela_end, (0, 0))
+                pg.mixer.music.stop()
+                som_end.play()
+
             else:
                 tomadas.draw(tela)
                 tomadas.update()
@@ -271,7 +290,7 @@ while True:
             pass
 
 
-    else:
+    else:                   #tela de inicio
         relogio.tick(30)
         tela.blit(fundo_start, (0,0))
         for event in pg.event.get():
