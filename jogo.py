@@ -4,6 +4,7 @@ import pygame as pg
 from pygame.locals import *
 from sys import exit
 from random import randint
+from random import randrange
 
 pg.init()
 largura = 800
@@ -22,7 +23,9 @@ debuff = 0
 rodando = True
 musica_fundo = pg.mixer.music.load("musicafundo.mp3")
 pg.mixer.music.play(-1)
+som_berrante = pg.mixer.Sound("berrante.mp3")
 tela_end = pg.image.load("tela end.png")
+tela_win = pg.image.load("tela_win.png")
 tomadas_aparecer = False
 
 class Cracha(pg.sprite.Sprite):
@@ -133,7 +136,7 @@ class Tomadas(pg.sprite.Sprite):
         self.image = self.sprites[self.atual]
         self.mask = pg.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
-        self.rect.y = randint(50, 550)
+        self.rect.y = randrange(50, 550, 30)
         self.image = pg.transform.scale(self.image, (int(64 * 2), int(64 * 2)))
 
     def update(self):
@@ -149,7 +152,6 @@ cracha = Cracha()
 rei = Reidograd()
 gota = Gota()
 marmita = Marmita()
-tomada = Tomadas()
 sprites = pg.sprite.Group()
 sprites.add(rei)
 sprites.add(cracha)
@@ -162,11 +164,11 @@ inimigos.add(rei)
 comida = pg.sprite.Group()
 comida.add(marmita)
 tomadas = pg.sprite.Group()
-tomadas.add(tomada)
 vencedor = pg.sprite.Group()
 vencedor.add(gota)
-
-
+for i in range(4):
+    tomada = Tomadas()
+    tomadas.add(tomada)
 
 while True:
     if start:
@@ -224,10 +226,12 @@ while True:
         if colisao_cracha:
             crachas -= 1
             debuff += 1
+            som_berrante.play()
             if crachas == 0:
                 colisao_cracha = pg.sprite.spritecollide(gota, coletaveis, True, pg.sprite.collide_mask)
                 pronto = True
                 tomadas_aparecer = True
+                som_berrante.play()
             else:
                 coletaveis.draw(tela)
                 coletaveis.update()
@@ -237,7 +241,7 @@ while True:
         colisao_comida = pg.sprite.spritecollide(gota, comida, True, pg.sprite.collide_mask)
         if colisao_comida:
             if debuff > 0:
-                debuff -=1
+                debuff -= 1
             else:
                 pass
         else:
@@ -248,11 +252,8 @@ while True:
             rodando = False
             tela.blit(tela_end, (0, 0))
         if colisao_inimigo and pronto:
-            mensagem2 = "Parabéns, agora você se tornou o novo Rei do Grad"
             rodando = False
-            texto2 = fonte.render(mensagem2, True, (0, 0, 0))
-            tela.blit(fundo, (0, 0))
-            tela.blit(texto2, (50, 200))
+            tela.blit(tela_win, (0, 0))
 
         elif not colisao_inimigo:
             vencedor.update()
