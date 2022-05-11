@@ -15,3 +15,10 @@ Conceitos que foram apresentados durante a disciplina e utilizados no projeto: D
 Desafios e erros enfrentados no decorrer do projeto e as lições aprendidas: O maior desafio encontrado durante o projeto foi sair da teoria e ir para a prática, uma vez que encontramos uma facilidade grande em pensar na ideia do jogo e subestimamos e passagem de teoria para a código. Dito isso, outras dificuldades encontradas foram: refinar o jogo para deixar tudo perfeito, organizar, de fato, quem fazia o quê e fazer com que todos os integrantes do grupo conseguissem conciliar o tempo entre o trabalho e o resto das atividades acadêmicas. As principais lições aprendidas foram: como trabalhar em grupo e aprender orientação à objeto e gerenciamento de prazos.
 
 
+COMO JOGAR:
+
+  1. Instalar python 3.0 e também as bibliotecas pygame.
+       obs: o jogo foi feito no PyCharm, mas tem como rodar em outras IDEs como o Visual Studio.
+  2. copiar o arquivo "jogo.py".
+  3. baixar todos arquivos do repositorio do mesmo jeito que estão escritos e copia-los e colar na aba da sua IDE.
+  4. rodar o jogo e se divertir.
