@@ -20,6 +20,7 @@ relogio = pg.time.Clock()
 z = 0
 w = 0
 fonte = pg.font.SysFont('arial', 30, False, False)
+fonte2 = pg.font.SysFont('arial', 25, False, False)
 pronto = False
 crachas = 3
 debuff = 0
@@ -32,6 +33,8 @@ som_win = pg.mixer.Sound("batidao.mp3")
 tela_end = pg.image.load("tela end.png")
 tela_win = pg.image.load("tela_win.png")
 tomadas_aparecer = False
+rapidao = False
+contarapido = 0
 
 #---------------------------definição dos objetos-------------------
 
@@ -187,13 +190,22 @@ while True:
         mensagem4 = f"Crachas Restantes: {crachas}"
         texto4 = fonte.render(mensagem4, False, (255, 255, 255))
         tela.blit(texto4, (480, 50))
+
+        if rapidao == True:
+            mensagem5 = "TO RAPIDÃO!!!"
+            texto5 = fonte2.render(mensagem5, False, (255, 255, 255))
+            tela.blit(texto5, (20, 50))
+            contarapido += 1
+            if contarapido == 25:
+                rapidao = False
+
         sprites.draw(tela)
         for event in pg.event.get():         #sair do jogo
             if event.type == QUIT:
                 pg.quit()
                 exit()
         if rodando:           #movimentação do personagem
-            if debuff == 0:
+            if debuff <= 0:
                 if pg.key.get_pressed()[K_a]:
                     z = z - 10
                 if pg.key.get_pressed()[K_d]:
@@ -252,7 +264,8 @@ while True:
 
         colisao_comida = pg.sprite.spritecollide(gota, comida, True, pg.sprite.collide_mask)
         if colisao_comida:
-            if debuff > 0:
+            rapidao = True
+            if debuff >= 0:
                 debuff -= 1
             else:
                 pass
